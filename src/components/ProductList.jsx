@@ -9,6 +9,8 @@ export function ProductList() {
   const [maxPrice, setMaxPrice] = useState(500);
   const [category, setCategory] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   useEffect(() => {
     fetchProducts()
@@ -16,41 +18,52 @@ export function ProductList() {
       .catch((error) => console.error(error));
   }, []);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search)
+    }, 200);
+
+    return () => clearTimeout(timeout);
+  }, [search])
+
   return (
     <main className="flex gap-6 p-6">
-      {
-        <>
-          <ProductFilter
-            minPrice={minPrice}
-            setMinPrice={setMinPrice}
-            maxPrice={maxPrice}
-            setMaxPrice={setMaxPrice}
-            category={category}
-            setCategory={setCategory}
-          />
+      <ProductFilter
+        minPrice={minPrice}
+        setMinPrice={setMinPrice}
+        maxPrice={maxPrice}
+        setMaxPrice={setMaxPrice}
+        category={category}
+        setCategory={setCategory}
+        search={search}
+        setSearch={setSearch}
+      />
 
-          <section className="grid grid-cols-3 gap-5 flex-1">
-            {products
-              .filter(
-                (product) =>
-                  product.price >= Number(minPrice) &&
-                  product.price <= Number(maxPrice),
-              )
-              .filter((product) =>
-                category !== "" ? product.category === category : true,
-              )
-              .map((product) => (
-                <ProductCard
-                  {...product}
-                  key={product.id}
-                  setSelectedProduct={setSelectedProduct}
-                />
-              ))}
-          </section>
-        </>
-      }
+      <section className="grid grid-cols-3 gap-5 flex-1">
+        {products
+          .filter(
+            (product) =>
+              product.price >= Number(minPrice) &&
+              product.price <= Number(maxPrice),
+          )
+          .filter((product) =>
+            category !== "" ? product.category === category : true,
+          )
+          .filter((product) =>
+            product.title.toLowerCase().includes(debouncedSearch.toLowerCase()),
+          )
+          .map((product) => (
+            <ProductCard
+              {...product}
+              key={product.id}
+              setSelectedProduct={setSelectedProduct}
+            />
+          ))}
+      </section>
 
-      {selectedProduct && <ProductDetails {...selectedProduct} products={products}/>}
+      {selectedProduct && (
+        <ProductDetails {...selectedProduct} products={products} />
+      )}
     </main>
   );
 }
