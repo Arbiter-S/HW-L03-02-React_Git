@@ -13,18 +13,28 @@ export function ProductList() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   useEffect(() => {
+    const cachedProducts = localStorage.getItem("products");
+
+    if (cachedProducts) {
+      setProducts(JSON.parse(cachedProducts));
+      return;
+    }
+
     fetchProducts()
-      .then((products) => setProducts(products))
+      .then((products) => {
+        setProducts(products);
+        localStorage.setItem("products", JSON.stringify(products));
+      })
       .catch((error) => console.error(error));
   }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setDebouncedSearch(search)
+      setDebouncedSearch(search);
     }, 200);
 
     return () => clearTimeout(timeout);
-  }, [search])
+  }, [search]);
 
   return (
     <main className="flex gap-6 p-6">
