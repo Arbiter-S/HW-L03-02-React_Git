@@ -1,8 +1,11 @@
-function ProductCard({ title, price, description, category, image, rating }) {
+import ProductDetails from "./ProductDetails";
+
+function ProductCard({ title, price, description, category, image, rating, setSelectedProduct }) {
   const { rate, count } = rating;
 
   return (
-    <div className="flex h-140 flex-col rounded-2xl bg-[#f9b652] shadow-sm">
+    <div className="flex h-140 flex-col rounded-2xl bg-[#f9b652] shadow-sm"
+     onClick={(event) => setSelectedProduct({ title, price, description, category, image, rating, setSelectedProduct })}>
       <div className="flex h-64 items-center justify-center p-6">
         <img src={image} alt={title} className="h-full w-full object-contain" />
       </div>

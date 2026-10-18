@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import ProductFilter from "./ProductFilter";
 import ProductCard from "./ProductCard";
+import ProductDetails from "./ProductDetails";
 
 export function ProductList() {
   const [products, setProducts] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(500);
   const [category, setCategory] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     fetchProducts()
@@ -16,29 +18,39 @@ export function ProductList() {
 
   return (
     <main className="flex gap-6 p-6">
-      <ProductFilter
-        minPrice={minPrice}
-        setMinPrice={setMinPrice}
-        maxPrice={maxPrice}
-        setMaxPrice={setMaxPrice}
-        category={category}
-        setCategory={setCategory}
-      />
+      {
+        <>
+          <ProductFilter
+            minPrice={minPrice}
+            setMinPrice={setMinPrice}
+            maxPrice={maxPrice}
+            setMaxPrice={setMaxPrice}
+            category={category}
+            setCategory={setCategory}
+          />
 
-      <section className="grid grid-cols-3 gap-5 flex-1">
-        {products
-          .filter(
-            (product) =>
-              product.price >= Number(minPrice) &&
-              product.price <= Number(maxPrice),
-          )
-          .filter((product) =>
-            category !== "" ? product.category === category : true,
-          )
-          .map((product) => (
-            <ProductCard {...product} key={product.id} />
-          ))}
-      </section>
+          <section className="grid grid-cols-3 gap-5 flex-1">
+            {products
+              .filter(
+                (product) =>
+                  product.price >= Number(minPrice) &&
+                  product.price <= Number(maxPrice),
+              )
+              .filter((product) =>
+                category !== "" ? product.category === category : true,
+              )
+              .map((product) => (
+                <ProductCard
+                  {...product}
+                  key={product.id}
+                  setSelectedProduct={setSelectedProduct}
+                />
+              ))}
+          </section>
+        </>
+      }
+
+      {selectedProduct && <ProductDetails {...selectedProduct} products={products}/>}
     </main>
   );
 }
